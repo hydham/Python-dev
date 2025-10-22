@@ -1,4 +1,4 @@
-```md
+md
 # Importing Modules & Python Standard Library
 
 Alright — today I’m learning how to **import modules** in Python.  
@@ -337,4 +337,3 @@ So even the “fun” parts of Python are written like normal modules.
 
 That wraps up everything from this lecture.  
 Next step for me: start exploring some of these standard library modules one by one and try to use them in small scripts — like writing a mini app that uses `datetime` and `os` together.
-```
