@@ -1,4 +1,4 @@
-```md
+md
 # Python Basics – Getting Started
 
 ## 1. Introduction  
@@ -131,4 +131,4 @@ You can write Python code in any plain text editor.
 - Got familiar with popular editors  
 
 **Next up → Variables and Data Types (starting with Strings)**
-```
+
