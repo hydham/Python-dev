@@ -257,3 +257,101 @@ After this deep dive, I finally have a mental map of how modules and packages be
 - `python -m` runs modules or packages in the correct, package-aware way.
 
 Now the entire module system finally feels clear and logical.
+
+# 🧩 Understanding `python -m` with Packages and Modules
+
+I finally wanted to clear my confusion about what exactly happens when I use `python -m` — especially how it behaves differently for modules vs packages.
+
+---
+
+## 🧠 What `-m` Really Does
+
+When I run a command like this:
+
+    python -m something
+
+it tells Python:
+
+> “Run *something* as a module inside its package context, not as a plain file.”
+
+This means Python sets up the **import path correctly**, so any relative imports like `from . import helper` will work.  
+That’s all the “magic” behind `-m`. The difference depends on *what* that “something” actually is.
+
+---
+
+## 🧩 Case 1 – Running a Module
+
+Example:
+
+    python -m database.mod1
+
+Step-by-step:
+
+1. Python locates the `database` package.  
+2. It executes `database/__init__.py` (because it has to import the package).  
+3. Then it runs `database/mod1.py` as the main program.
+
+So effectively:
+
+- `database/__init__.py` is executed first.  
+- `mod1.py` is executed as the script.  
+- Inside `mod1.py`, `__name__` becomes `"__main__"`.
+
+That’s why this works exactly like running the module directly, but with proper package context so that relative imports don’t break.
+
+---
+
+## 📦 Case 2 – Running a Package
+
+Example:
+
+    python -m database
+
+What happens:
+
+1. Python finds the `database` directory.  
+2. It looks for a file named `__main__.py` inside that folder.  
+3. It executes that file as the program.
+
+So here:
+
+- `__init__.py` runs first for package initialization.  
+- Then `__main__.py` runs as the “main” entry point.  
+
+If `__main__.py` doesn’t exist, Python throws an error:
+
+    python: No module named database.__main__; 'database' is a package and cannot be directly executed
+
+That’s why a runnable package **must** include a `__main__.py`.
+
+---
+
+## 📁 Case 3 – Just Importing Normally
+
+When I do this in code:
+
+    import database
+
+Only `__init__.py` executes — nothing else.  
+Because I’m not running anything, I’m just *loading* the package into memory.
+
+---
+
+## 🧱 Summary Table
+
+| Command | Runs first | Executed as `__main__` | What it does |
+|----------|-------------|------------------------|---------------|
+| `python file.py` | — | `file.py` | Run a standalone script |
+| `python -m package.module` | `package/__init__.py` | `package/module.py` | Run a module inside its package (keeps relative imports working) |
+| `python -m package` | `package/__init__.py` | `package/__main__.py` | Run the package itself (its entry point) |
+| `import package` | `package/__init__.py` | — | Only loads the package |
+
+---
+
+Now it finally makes sense:  
+
+- `__init__.py` always runs when a package is imported or executed.  
+- `__main__.py` only runs when a package is executed with `python -m package`.  
+- For modules, Python runs the module file itself as `__main__`.  
+
+That single distinction clears up the confusion between `__init__.py` and `__main__.py`.
